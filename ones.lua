@@ -27,7 +27,6 @@ function ui.multiReference(tab, groupbox, name)
     return { ref1, ref2, ref3 }
 end
 client.exec("clear")
-print("Failed to load requaries, try ! loadrq")
 
 local lua = {}
 lua.database = {
