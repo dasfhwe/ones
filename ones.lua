@@ -738,6 +738,12 @@ for i=1, #vars.aaStates do
         def_yawJitterStatic = ui.new_slider("AA", "Other", "[Defensive] \nyaw jitter" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         def_yawJitterLeft = ui.new_slider("AA", "Other", "[Defensive] Left\nyaw jitter" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         def_yawJitterRight = ui.new_slider("AA", "Other", "[Defensive] Right\nyaw jitter" .. aaContainer[i], -180, 180, 0, true, "°", 1),
+        def_yawJitterDelay = ui.new_slider("AA", "Other", "Delay count\nyaw jitter" .. aaContainer[i], 2, 15, 0, true, "t", 1, function(er)
+            if er == 0 then return "Off"
+            elseif er == 6 then return "Slow"
+            elseif er == 10 then return "Random"
+            end
+        end),
         def_bodyYaw = ui.new_combobox("AA", "Other", "[Defensive] Body yaw\n" .. aaContainer[i], "Off", "Custom Desync", "Opposite", "Jitter", "Static"),
         def_bodyYawStatic = ui.new_slider("AA", "Other", "[Defensive] \nbody yaw" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         def_fakeYawLimit = ui.new_slider("AA", "Other", "[Defensive] Fake yaw limit\n" .. aaContainer[i], -59, 59, 0, true, "°", 1),
@@ -981,6 +987,7 @@ end)
 
 local counter = 0
 local delsw = false
+local delsw1 = false
 
 distance_knife = {}
 distance_knife.anti_knife_dist = function (x1, y1, z1, x2, y2, z2)
@@ -1065,6 +1072,10 @@ client.set_event_callback("setup_command", function(cmd)
 
     if (globals.tickcount() % ui.get(aaBuilder[vars.pState].yawJitterDelay)) == 1 then
         delsw = not delsw
+    end
+
+    if (globals.tickcount() % ui.get(aaBuilder[vars.pState].def_yawJitterDelay)) == 1 then
+        delsw1 = not delsw1
     end
 
     if ui.get(menu.aaTab.baseat) == "At target" then
@@ -1290,6 +1301,11 @@ client.set_event_callback("setup_command", function(cmd)
                     }
     
                     ui.set(refs.yawJitter[2], ways[(globals.tickcount() % 3) + 1] )
+                elseif ui.get(aaBuilder[vars.pState].def_yawJitter) == "Center" then
+                    ui.set(refs.yaw[1], "180")
+                    ui.set(refs.yaw[2], delsw1 and ui.get(aaBuilder[vars.pState].def_yawJitterStatic) or -ui.get(aaBuilder[vars.pState].def_yawJitterStatic))
+                    ui.set(refs.yawJitter[1], "Off")
+                    ui.set(refs.yawJitter[2], 0)
                 elseif ui.get(aaBuilder[vars.pState].def_yawJitter) == "L&R" then 
                     ui.set(refs.yawJitter[1], "Center")
                     ui.set(refs.yawJitter[2], (side == 1 and ui.get(aaBuilder[vars.pState].def_yawJitterLeft) or ui.get(aaBuilder[vars.pState].def_yawJitterRight)))
@@ -2058,6 +2074,7 @@ client.set_event_callback("paint_ui", function()
         ui.set_visible(aaBuilder[i].def_yawJitterStatic, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_yaw) ~= "Off" and ui.get(aaBuilder[i].def_yawJitter) ~= "Off" and ui.get(aaBuilder[i].def_yawJitter) ~= "L&R" and ui.get(aaBuilder[i].def_yawJitter) ~= "3-Way" and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_yawJitterLeft, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_yaw) ~= "Off" and ui.get(aaBuilder[i].def_yawJitter) == "L&R" and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_yawJitterRight, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_yaw) ~= "Off" and ui.get(aaBuilder[i].def_yawJitter) == "L&R" and isBuilderTab and stateEnabled and isEnabled))
+        ui.set_visible(aaBuilder[i].def_yawJitterDelay, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_yaw) ~= "Off" and ui.get(aaBuilder[i].def_yawJitter) == "Center" and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_bodyYaw, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_bodyYawStatic, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_bodyYaw) ~= "Off" and ui.get(aaBuilder[i].def_bodyYaw) ~= "Opposite" and ui.get(aaBuilder[i].def_bodyYaw) ~= "Custom Desync" and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_fakeYawLimit, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_bodyYaw) == "Custom Desync" and isBuilderTab and stateEnabled and isEnabled))
