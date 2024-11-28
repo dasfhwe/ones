@@ -8,6 +8,8 @@ local function try_require(module, msg)
     if success then return result else return error(msg) end
 end
 
+math.lerp = function (a, b, w)  return a + (b - a) * w  end
+
 local gram_create = function(value, count) local gram = { }; for i=1, count do gram[i] = value; end return gram; end
 local gram_update = function(tab, value, forced) local new_tab = tab; if forced or new_tab[#new_tab] ~= value then table.insert(new_tab, value); table.remove(new_tab, 1); end; tab = new_tab; end
 local get_average = function(tab) local elements, sum = 0, 0; for k, v in pairs(tab) do sum = sum + v; elements = elements + 1; end return sum / elements; end
@@ -603,19 +605,19 @@ end
 
 -- @region UI_LAYOUT start
 local tab, container = "AA", "Anti-aimbot angles"
-local label = ui.new_label("AA", "Fake lag", "\aFFFFFFFFanoflow \aC0C0C0FF[live]")
-local tabPicker = ui.new_combobox("AA", "Fake lag", "\nTab", "Main", "Settings", "Anti-aim")
-local aaTabs = ui.new_combobox("AA", "Fake lag", "\nAA Tabs", "Main", "Builder")
+local tabPicker = ui.new_combobox("AA", "Anti-aimbot angles", "\nTab", "♝ Main", "⚙️ Settings", "➲ Anti-aim")
+local aaTabs = ui.new_combobox("AA", "Fake lag", "Anti-aims ~ selector", "⚙️ Settings", "Builder", "Other")
+local mTabs = ui.new_combobox("AA", "Fake lag", "Settings ~ selector", "☀ Visuals", "⌨ Miscellaneous")
 
 
 local menu = {
     aaTab = {
-        lableoth = ui.new_label(tab, container, "\aFFFFFFFF•  \aFFFFFFFFMain"),
         baseat = ui.new_combobox(tab, container, "\aafaf62ffYaw base", "At target", "Local view"),
         safe_head = ui.new_multiselect("AA", "Other", "Safe head values", "Knife", "Zeus"),
+        AvoidBack = ui.new_checkbox("AA", "Other", "Avoid Backstab"),
         label332 = ui.new_label("AA", "Fake lag", "    "),
         label333 = ui.new_label("AA", "Fake lag", "\aFFFFFFFF•  \aFFFFFFFFBinds"),
-        freestandlabel = ui.new_label("AA", "Fake lag", "Freestand"),
+        freestandlabel = ui.new_label("AA", "Fake lag", "📋 Freestand"),
         freestandHotkey = ui.new_hotkey("AA", "Fake lag", "Freestand", true),
         manualsenb = ui.new_checkbox(tab, container, "Enable Manuals"),
         manuals = ui.new_combobox(tab, container, "Manuals", "Off", "Default", "Static"),
@@ -632,33 +634,30 @@ local menu = {
         state = ui.new_combobox(tab, container, "Anti-aim state", vars.aaStates)
     },
     visualsTab = {
-        lablev = ui.new_label(tab, container, "\aFFFFFFFF•  \aFFFFFFFFVisuals"),
+        labelv = ui.new_label("AA", "Fake lag", "Some functions may not work correctly!"),
+        labelv1 = ui.new_label("AA", "Fake lag", "Please let us know if you see an error in the discord"),
         indicatorsType = ui.new_checkbox(tab, container, "Crosshair Indicators"),
         indicatorsClr = ui.new_color_picker(tab, container, "Main Color", lua_color.r, lua_color.g, lua_color.b, 255),
         arrowsindenb = ui.new_checkbox(tab, container, "Manual arrows"),
         arrowIndicatorStyle = ui.new_combobox(tab, container, "Arrows", "Standart", "Triangle"),
         arrowClr = ui.new_color_picker(tab, container, "Arrow Color", lua_color.r, lua_color.g, lua_color.b, 255),
-        hitlogsenb = ui.new_checkbox(tab, container, "Hitlog"),
-        hitlogs_krutie = ui.new_multiselect(tab, container, "Hitlogs", "Hit", "Miss"),
+        hitlogsenb = ui.new_checkbox(tab, container, "On screen logs"),
+        hitlogs_krutie = ui.new_multiselect(tab, container, "\nlogs", "Hit", "Miss"),
         hitlogs_krutieClr = ui.new_color_picker(tab, container, "Hitlogs Color", lua_color.r, lua_color.g, lua_color.b, 255),
         minimum_damageenb = ui.new_checkbox(tab, container, "Min Damage Indicator"),
-        minimum_damageIndicator = ui.new_combobox(tab, container, "Minimum Damage Indicator", "Bind", "Constant"),
+        minimum_damageIndicator = ui.new_combobox(tab, container, "\nselect", "Bind", "Constant"),
         fpsboost = ui.new_checkbox(tab, container, "Optimization"),
         blurmenu = ui.new_checkbox(tab, container, "Blur menu"),
-    },
-    miscTab = {
-        labledgdfgs = ui.new_label(tab, container, " "),
-        lablevr = ui.new_label(tab, container, "\aFFFFFFFF•  \aFFFFFFFFMisc"),
         watermarkl = ui.new_label(tab, container, "Watermark Color"),
         watermarkClr = ui.new_color_picker(tab, container, "Watermark Color", lua_color.r, lua_color.g, lua_color.b, 255),
-        AvoidBack = ui.new_checkbox(tab, container, "Avoid Backstab"),
+    },
+    miscTab = {
+        labelm = ui.new_label("AA", "Fake lag", "Some functions may not work correctly!"),
+        labelm1 = ui.new_label("AA", "Fake lag", "Please let us know if you see an error in the discord"),
         filtercons = ui.new_checkbox(tab, container, "Console Filter"),
-        othfunc = ui.new_label("AA", "Other", "\aFFFFFFFF~ \aFFFFFFFFMovements functions"),
         auto_tp = ui.new_checkbox("AA", "Other", "Teleport if hittable"),
         auto_tpHotkey = ui.new_hotkey("AA", "Other", "Teleport if hittable", true),
-        auto_tp_delay = ui.new_slider("AA", "Other", "Delay", 0, 10, 0),
-        --unsafecharhge = ui.new_checkbox("AA", "Other", "Auto discharge exploit \a4f4f4fff[only scout & awp]"),
-        --unsafecharhgekey = ui.new_hotkey("AA", "Other", "Auto discharge exploit \a4f4f4fff[only scout & awp]", true),
+        auto_tp_delay = ui.new_slider("AA", "Other", "⌛ Delay", 0, 15, 0),
         clanTag = ui.new_checkbox(tab, container, "Clantag"),
         trashTalk = ui.new_checkbox(tab, container, "Trashtalk"),
         trashTalk_vibor = ui.new_multiselect(tab, container, "\n trashtalk vibor", "Kill", "Death"),
@@ -671,16 +670,19 @@ local menu = {
         label2 = ui.new_label("AA", "Fake lag", "Last update was \aFFFFFFFF 14.11.2024"),
         label3 = ui.new_label("AA", "Fake lag", "Your build is \aC0C0C0FF[live]"),
         label1488 = ui.new_label("AA", "Fake lag", "Session time: "),
-        label4 = ui.new_label ("AA", "Other", "\aFFFFFFFF~ \aFFFFFFFFDiscord"),
-        buttonsd = ui.new_button("AA", "Other", "Join us", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/p3CAmKKnwW") end),
-        labels = ui.new_label(tab, container, "\aFFFFFFFF~  \aFFFFFFFFPreset \aFFFFFFFFlist"),
+        --label4 = ui.new_label ("AA", "Other", "\aFFFFFFFF~ \aFFFFFFFFDiscord"),
+        --buttonsd = ui.new_button("AA", "Other", "Join us", function() SteamOverlayAPI.OpenExternalBrowserURL("https://discord.gg/p3CAmKKnwW") end),
         list = ui.new_listbox(tab, container, "Configs", ""),
         name = ui.new_textbox(tab, container, "Config name", ""),
         load = ui.new_button(tab, container, "\aFFFFFFFFLoad", function() end),
         save = ui.new_button(tab, container, "\aFFFFFFFFSave", function() end),
         delete = ui.new_button(tab, container, "\aFFFFFFFFDelete", function() end),
-        import = ui.new_button(tab, container, "\aFFFFFFFFImport", function() end),
-        export = ui.new_button(tab, container, "\aFFFFFFFFExport", function() end)
+        export = ui.new_button(tab, container, "\aFFFFFFFFExport", function() end),
+        labelc = ui.new_label("AA", "Other", "Create config"),
+        create_name = ui.new_textbox("AA", "Other", "Config name", ""),
+        create = ui.new_button("AA", "Other", "\aFFFFFFFFCreate", function() end),
+        import = ui.new_button("AA", "Other", "\aFFFFFFFFImport", function() end),
+
     }
 }
 
@@ -704,7 +706,7 @@ for i=1, #vars.aaStates do
         yawStatic = ui.new_slider(tab, container, "\nyaw" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         yawLeft = ui.new_slider(tab, container, "Left\nyaw" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         yawRight = ui.new_slider(tab, container, "Right\nyaw" .. aaContainer[i], -180, 180, 0, true, "°", 1),
-        yawJitter = ui.new_combobox(tab, container, "Yaw jitter\n" .. aaContainer[i], "Off", "Offset", "Center", "Skitter", "Random", "3-Way", "L&R"),
+        yawJitter = ui.new_combobox(tab, container, "Yaw jitter\n" .. aaContainer[i], "Off", "Offset", "Center", "Delay", "Skitter", "Random", "3-Way", "L&R"),
         wayFirst = ui.new_slider(tab, container, "First\nyaw jitter" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         waySecond = ui.new_slider(tab, container, "Second\nyaw jitter" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         wayThird = ui.new_slider(tab, container, "Third\nyaw jitter" .. aaContainer[i], -180, 180, 0, true, "°", 1),
@@ -725,8 +727,10 @@ for i=1, #vars.aaStates do
         forceDefensiveon = ui.new_slider(tab, container, "Defensive Tick on\n" .. aaContainer[i], 1, 40, 1),
         forceDefensiveoff = ui.new_slider(tab, container, "Defensive Tick off\n" .. aaContainer[i], 1, 40, 1),
         forceDefensiverandom = ui.new_checkbox(tab, container, "Randomize tick \n" .. aaContainer[i]),
-        def_pitch = ui.new_combobox("AA", "Other", "[Defensive] Pitch\n" .. aaContainer[i], "Off", "Down", "Up", "Random", "Custom", "Fluculate"),
+        def_pitch = ui.new_combobox("AA", "Other", "[Defensive] Pitch\n" .. aaContainer[i], "Off", "Down", "Up", "Random", "3-way", "Custom", "Fluculate"),
         def_pitchSlider = ui.new_slider("AA", "Other", "[Defensive] \nPitch add" .. aaContainer[i], -89, 89, 0, true, "°", 1),
+        def_pitch_s1 = ui.new_slider("AA", "Other", "[Defensive] From\n" .. aaContainer[i], -89, 89, 0, true, "°", 1),
+        def_pitch_s2 = ui.new_slider("AA", "Other", "[Defensive] To\n" .. aaContainer[i], -89, 89, 0, true, "°", 1),
         def_yaw = ui.new_combobox("AA", "Other", "[Defensive] Yaw\n" .. aaContainer[i], "Off", "180", "Spin", "L&R"),
         def_yawStatic = ui.new_slider("AA", "Other", "[Defensive] \nyaw" .. aaContainer[i], -180, 180, 0, true, "°", 1),
         def_yawLeft = ui.new_slider("AA", "Other", "[Defensive] Left\nyaw" .. aaContainer[i], -180, 180, 0, true, "°", 1),
@@ -1052,7 +1056,7 @@ client.set_event_callback("setup_command", function(cmd)
     if not pStill and entity.get_prop(vars.localPlayer, "m_flDuckAmount") > 0.1 then vars.pState = 8 end
     if not onground then vars.pState = 6 end
     if not onground and entity.get_prop(vars.localPlayer, "m_flDuckAmount") > 0.1 then vars.pState = 7 end
-    if onground and isFs1 then vars.pState = 10 end
+    if isFs1 then vars.pState = 10 end
 
     if ui.get(aaBuilder[9].enableState) and not func.table_contains(ui.get(aaBuilder[9].stateDisablers), vars.intToS[vars.pState]) and isDt == false and isOs == false and isFl == true then
 		vars.pState = 9
@@ -1180,7 +1184,7 @@ client.set_event_callback("setup_command", function(cmd)
                             ui.get(aaBuilder[vars.pState].wayThird)
                         }
                         ui.set(refs.yawJitter[2], ways[(globals.tickcount() % 3) + 1] )
-                    elseif ui.get(aaBuilder[vars.pState].yawJitter) == "Center" then
+                    elseif ui.get(aaBuilder[vars.pState].yawJitter) == "Delay" then
                         ui.set(refs.yaw[1], "180")
                         ui.set(refs.yaw[2], delsw and ui.get(aaBuilder[vars.pState].yawJitterStatic) or -ui.get(aaBuilder[vars.pState].yawJitterStatic))    
                         ui.set(refs.yawJitter[1], "Off")
@@ -1260,7 +1264,7 @@ client.set_event_callback("setup_command", function(cmd)
                 elseif ui.get(aaBuilder[vars.pState].def_pitch) == "Down" then
                     ui.set(refs.pitch[1], "Custom")
                     ui.set(refs.pitch[2], 89)
-                elseif ui.get(aaBuilder[vars.pState].def_pitch) == "Random" then
+                elseif ui.get(aaBuilder[vars.pState].def_pitch) == "3-way" then
                     if globals.tickcount() % 3 == 0 then
                         ui.set(refs.pitch[1], "Custom")
                         ui.set(refs.pitch[2], 89)
@@ -1274,9 +1278,12 @@ client.set_event_callback("setup_command", function(cmd)
                 elseif ui.get(aaBuilder[vars.pState].def_pitch) == "Custom" then
                     ui.set(refs.pitch[1], "Custom")
                     ui.set(refs.pitch[2], ui.get(aaBuilder[vars.pState].def_pitchSlider))
+                elseif ui.get(aaBuilder[vars.pState].def_pitch) == "Random" then
+                    ui.set(refs.pitch[1], "Custom")
+                    ui.set(refs.pitch[2], math.random(ui.get(aaBuilder[vars.pState].def_pitch_s1), ui.get(aaBuilder[vars.pState].def_pitch_s2)))
                 elseif ui.get(aaBuilder[vars.pState].def_pitch) == "Fluculate" then
                     local speed = 5 
-                    local range = 60
+                    local range = 80
                     ui.set(refs.pitch[1], "Custom")
                     ui.set(refs.pitch[2], (-1 + -math.sin(globals.curtime() * speed) * range))
                 end
@@ -1345,7 +1352,7 @@ client.set_event_callback("setup_command", function(cmd)
                     }
 
                     ui.set(refs.yawJitter[2], ways[(globals.tickcount() % 3) + 1] )
-                elseif ui.get(aaBuilder[vars.pState].yawJitter) == "Center" then
+                elseif ui.get(aaBuilder[vars.pState].yawJitter) == "Delay" then
                     ui.set(refs.yaw[1], "180")
                     ui.set(refs.yaw[2], delsw and ui.get(aaBuilder[vars.pState].yawJitterStatic) or -ui.get(aaBuilder[vars.pState].yawJitterStatic))
                     ui.set(refs.yawJitter[1], "Off")
@@ -1437,7 +1444,7 @@ client.set_event_callback("setup_command", function(cmd)
    local players = entity.get_players(true)
    local eye_x, eye_y, eye_z = client.eye_position()
    returnthat = false 
-   if ui.get(menu.miscTab.AvoidBack) ~= 0 then
+   if ui.get(menu.aaTab.AvoidBack) ~= 0 then
        if players ~= nil then
            for i, enemy in pairs(players) do
                local head_x, head_y, head_z = entity.hitbox_position(players[i], 5)
@@ -1531,6 +1538,7 @@ client.set_event_callback("pre_render", function()
     local flags = entity.get_prop(entity.get_local_player(), "m_fFlags")
     ground_ticks = bit.band(flags, 1) == 0 and 0 or (ground_ticks < 5 and ground_ticks + 1 or ground_ticks)
     
+    if ui.get(menu.miscTab.animationsEnabled) then
 
     if func.table_contains(ui.get(menu.miscTab.animations), "Static legs") then
         entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 1, 6) 
@@ -1542,21 +1550,21 @@ client.set_event_callback("pre_render", function()
         entity.set_prop(entity.get_local_player(), "m_flPoseParameter", math.random(0, 10)/10, 6)
     end
 
-    if func.table_contains(ui.get(menu.miscTab.animations), "Leg fucker") then
-        if not legsSaved then
-            legsSaved = ui.get(refs.legMovement)
-        end
-        ui.set_visible(refs.legMovement, false)
-        if func.table_contains(ui.get(menu.miscTab.animations), "Leg fucker") then
-            ui.set(refs.legMovement, legsTypes[math.random(1, 3)])
-            entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 9,  0)
-        end
+    --if func.table_contains(ui.get(menu.miscTab.animations), "Leg fucker") then
+        --if not legsSaved then
+        --    legsSaved = ui.get(refs.legMovement)
+        --end
+        --ui.set_visible(refs.legMovement, false)
+        --if func.table_contains(ui.get(menu.miscTab.animations), "Leg fucker") then
+        --    ui.set(refs.legMovement, legsTypes[math.random(1, 2)])
+            --entity.set_prop(entity.get_local_player(), "m_flPoseParameter", 9,  0)
+        --end
 
-    elseif (legsSaved == "Off" or legsSaved == "Always slide" or legsSaved == "Never slide") then
-        ui.set_visible(refs.legMovement, true)
-        ui.set(refs.legMovement, legsSaved)
-        legsSaved = false
-    end
+    --elseif (legsSaved == "Off" or legsSaved == "Always slide" or legsSaved == "Never slide") then
+    --    ui.set_visible(refs.legMovement, true)
+    --    ui.set(refs.legMovement, legsSaved)
+    --    legsSaved = false
+    --end
 
     if func.table_contains(ui.get(menu.miscTab.animations), "0 pitch on landing") then
         ground_ticks = bit.band(flags, 1) == 1 and ground_ticks + 1 or 0
@@ -1585,13 +1593,18 @@ client.set_event_callback("pre_render", function()
         ui.set(refs.legMovement, legsSaved)
         legsSaved = false
     end
-
-    if not ui.get(menu.miscTab.animationsEnabled) then
-        return
-    end
     
+    end
 end)
 -- @region AA_CALLBACKS end
+
+client.set_event_callback("setup_command", function(cmd)
+    is_on_ground = cmd.in_jump == 0
+
+    if func.table_contains(ui.get(menu.miscTab.animations), "Leg fucker") then
+        ui.set(refs.legMovement, cmd.command_number % 3 == 0 and "Off" or "Always slide")
+    end
+end)
 
 -- @region INDICATORS start
 local alpha = 0
@@ -1877,7 +1890,7 @@ client.set_event_callback("paint", function()
     end
 
     if not ui.get(menu.visualsTab.indicatorsType) then
-            local clr_r, clr_g, clr_b = ui.get(menu.miscTab.watermarkClr)
+            local clr_r, clr_g, clr_b = ui.get(menu.visualsTab.watermarkClr)
         
             local watermaro4ka = animate_text(globals.curtime(), lua_name, clr_r, clr_g, clr_b, 255)
             renderer.text(sizeX/2 - renderer.measure_text("db", lua_name)/2, sizeY - 20, 155, 0, 0, 0, "db", nil, unpack(watermaro4ka))
@@ -1948,6 +1961,31 @@ ui.set_callback(menu.configTab.save, function()
     if pcall(protected) then
         notifications.new(string.format('Successfully saved "$%s$"', name), r, g, b)
     end
+end)
+
+ui.set_callback(menu.configTab.create, function()
+
+    local name = ui.get(menu.configTab.create_name)
+    if name == "" then return end
+
+    for i, v in pairs(presets) do
+        if v.name == name:gsub('*', '') then
+            notifications.new(string.format('You can`t create built-in preset "$%s$"', name:gsub('*', '')), 255, 120, 120)
+            return
+        end
+    end
+
+    if name:match("[^%w]") ~= nil then
+        notifications.new(string.format('Failed to create "$%s$" due to invalid characters', name), 255, 120, 120)
+        return
+    end
+local protected = function()
+    saveConfig(name)
+    ui.update(menu.configTab.list, getConfigList())
+end
+if pcall(protected) then
+    notifications.new(string.format('Successfully created "$%s$"', name), r, g, b)
+end
 end)
 
 ui.set_callback(menu.configTab.delete, function()
@@ -2027,13 +2065,14 @@ client.set_event_callback("paint_ui", function()
     end
     local isEnabled = true
     ui.set_visible(tabPicker, isEnabled)
-    ui.set_visible(aaTabs, ui.get(tabPicker) == "Anti-aim" and isEnabled)
+    ui.set_visible(aaTabs, ui.get(tabPicker) == "➲ Anti-aim" and isEnabled)
+    ui.set_visible(mTabs, ui.get(tabPicker) == "⚙️ Settings" and isEnabled)
     traverse_table(binds)
-    local isAATab = ui.get(tabPicker) == "Anti-aim" and ui.get(aaTabs) == "Main"
-    local isBuilderTab = ui.get(tabPicker) == "Anti-aim" and ui.get(aaTabs) == "Builder"
-    local isVisualsTab = ui.get(tabPicker) == "Settings" 
-    local isMiscTab = ui.get(tabPicker) == "Settings" 
-    local isCFGTab = ui.get(tabPicker) == "Main"
+    local isAATab = ui.get(tabPicker) == "➲ Anti-aim" and ui.get(aaTabs) == "⚙️ Settings"
+    local isBuilderTab = ui.get(tabPicker) == "➲ Anti-aim" and ui.get(aaTabs) == "Builder"
+    local isVisualsTab = ui.get(tabPicker) == "⚙️ Settings" and ui.get(mTabs) == "☀ Visuals"
+    local isMiscTab = ui.get(tabPicker) == "⚙️ Settings" and ui.get(mTabs) == "⌨ Miscellaneous"
+    local isCFGTab = ui.get(tabPicker) == "♝ Main"
 
     ui.set(aaBuilder[1].enableState, true)
     for i = 1, #vars.aaStates do
@@ -2055,7 +2094,7 @@ client.set_event_callback("paint_ui", function()
         ui.set_visible(aaBuilder[i].yawJitterStatic, vars.activeState == i and ui.get(aaBuilder[i].yaw) ~= "Off" and ui.get(aaBuilder[i].yawJitter) ~= "Off" and ui.get(aaBuilder[i].yawJitter) ~= "L&R" and ui.get(aaBuilder[i].yawJitter) ~= "3-Way" and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].yawJitterLeft, vars.activeState == i and ui.get(aaBuilder[i].yaw) ~= "Off" and ui.get(aaBuilder[i].yawJitter) == "L&R" and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].yawJitterRight, vars.activeState == i and ui.get(aaBuilder[i].yaw) ~= "Off" and ui.get(aaBuilder[i].yawJitter) == "L&R" and isBuilderTab and stateEnabled and isEnabled)
-        ui.set_visible(aaBuilder[i].yawJitterDelay, vars.activeState == i and ui.get(aaBuilder[i].yaw) ~= "Off" and ui.get(aaBuilder[i].yawJitter) == "Center" and isBuilderTab and stateEnabled and isEnabled)
+        ui.set_visible(aaBuilder[i].yawJitterDelay, vars.activeState == i and ui.get(aaBuilder[i].yaw) ~= "Off" and ui.get(aaBuilder[i].yawJitter) == "Delay" and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].bodyYaw, vars.activeState == i and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].bodyYawStatic, vars.activeState == i and ui.get(aaBuilder[i].bodyYaw) ~= "Off" and ui.get(aaBuilder[i].bodyYaw) ~= "Opposite" and ui.get(aaBuilder[i].bodyYaw) ~= "Custom Desync" and isBuilderTab and stateEnabled and isEnabled)
         ui.set_visible(aaBuilder[i].fakeYawLimit, vars.activeState == i and ui.get(aaBuilder[i].bodyYaw) == "Custom Desync" and isBuilderTab and stateEnabled and isEnabled)
@@ -2063,6 +2102,8 @@ client.set_event_callback("paint_ui", function()
 
         ui.set_visible(aaBuilder[i].def_pitch, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_pitchSlider , ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and isBuilderTab and stateEnabled and ui.get(aaBuilder[i].def_pitch) == "Custom" and isEnabled))
+        ui.set_visible(aaBuilder[i].def_pitch_s1 , ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and isBuilderTab and stateEnabled and ui.get(aaBuilder[i].def_pitch) == "Random" and isEnabled))
+        ui.set_visible(aaBuilder[i].def_pitch_s2 , ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and isBuilderTab and stateEnabled and ui.get(aaBuilder[i].def_pitch) == "Random" and isEnabled))
         ui.set_visible(aaBuilder[i].def_yaw, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_yawStatic, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_yaw) ~= "Off" and (ui.get(aaBuilder[i].def_yaw) ~= "L&R") and isBuilderTab and stateEnabled and isEnabled))
         ui.set_visible(aaBuilder[i].def_yawLeft, ui.get(aaBuilder[i].defensiveAntiAim) and (vars.activeState == i and ui.get(aaBuilder[i].def_yaw) ~= "Off" and (ui.get(aaBuilder[i].def_yaw) == "L&R") and isBuilderTab and stateEnabled and isEnabled))
@@ -2169,11 +2210,11 @@ local function get_original_clantag()
 end
 
 local function clantag_set()
-    local lua_name1 = "anoflow [beta]"
+    local clnt = "anoflow"
     if ui.get(menu.miscTab.clanTag) then
         if ui.get(ui.reference("Misc", "Miscellaneous", "Clan tag spammer")) then return end
 
-		local clan_tag = clantag_anim(lua_name1, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 11, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25})
+		local clan_tag = clantag_anim(clnt, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 11, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25})
 
         if entity.get_prop(entity.get_game_rules(), "m_gamePhase") == 5 then
             clan_tag = clantag_anim('anoflow', {10})
@@ -2246,30 +2287,27 @@ chat_spammer.phrases = {
     kill = {
         {"1"},
         {"𝘴𝘶𝘤𝘬 𝘮𝘺 𝘥𝘪𝘤𝘬"},
-        {"Моя бабушка быстрее реакцию выдаёт XD"},
-        {"байтишся как визарис ХАХАХАХАХА"},
+        {"My grandmother gives a faster reaction XD"},
+        {"1", "shut up nigga"},
         {"I’ve seen bots with more ambition than you.", "try kill me again nigga"},
         {"lol", "even bots miss less"},
         {"?", "why you so slow?", "fucking noob"},
         {"anoflow won't give you a chance"},
-        {"даже аи пик так не байтится"},
-        {"neverwin.cc"},
+        {"even the AI peak doesn't byte like that"},
+        {"neverwin.cc not busted((("},
         {"so ez", "for 3$ lua"},
-        {"важнейшая новость этой недели заключается в том", "фак нигерс", "фак нигерс", "фак нигерс"},
         {"client.exec(''god'')"},
-        {"baim?", "sory, my multipoints so bad", "(fake)"},
-        {"ещё одна чурка со страны вылетела"},
-        {"ебаный школьник опять сосёт мне у всех на глазах"},
+        {"baim?", "sory, my multipoints so bad"},
         {"1."},
     },
 
     death = {
-        {"бля как же тебе везёт"},
-        {"в этот раз моя вина", "зря я дал тебе шанс"},
-        {"я просто в ахуе с чита"},
-        {"baim user lol"},
-        {"НУ ЧТО ЗА ЕБЛАН ЗА МНОЙ ХОДИТ"},
-        {"вот он", "игрок ебаный"}
+        {"Damn how lucky you are"},
+        {"This time it's my fault.", "I shouldn't have given you a chance."},
+        {"fucking bt"},
+        {")"},
+        {"wtf", "Why is my cheat so tired in 9 hours"},
+        {"dont write me 1", "игрок ебаный"}
     }
 }
 
@@ -2420,7 +2458,7 @@ client.set_event_callback('shutdown', function ()
 end)
 
 client.set_event_callback('paint_ui', function ()
-    local isAATab = ui.get(tabPicker) == "Anti-aim" and ui.get(aaTabs) == "Other"
+    local isAATab = ui.get(tabPicker) == "➲ Anti-aim" and ui.get(aaTabs) == "Other"
     if isAATab then
         traverse_table_on(binds)
         else
@@ -2485,8 +2523,15 @@ local auto_discharge = function(cmd)
 end
 
 client.set_event_callback("paint", function()
-    if ui.get(menu.miscTab.auto_tp) and ui.get(menu.miscTab.auto_tpHotkey) then
-        renderer.indicator(215,211,213,255, "BREAKER")
+    local doubletap_ref = ui.get(refs.dt[1]) and ui.get(refs.dt[2])
+    if ui.get(menu.miscTab.auto_tp) and ui.get(menu.miscTab.auto_tpHotkey) and doubletap_ref and not is_vulnerable() then
+        renderer.indicator(215,211,213,255, "TELEPORT")
+    end
+    if ui.get(menu.miscTab.auto_tp) and ui.get(menu.miscTab.auto_tpHotkey) and not doubletap_ref then
+        renderer.indicator(215,1,1,255, "BREAKER")
+    end
+    if ui.get(menu.miscTab.auto_tp) and ui.get(menu.miscTab.auto_tpHotkey) and doubletap_ref and is_vulnerable() then
+        renderer.indicator(143, 194, 21, 255, "TELEPORTING")
     end
 end)
 
